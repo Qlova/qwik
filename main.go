@@ -34,6 +34,11 @@ func build(i string) {
 		return
 	}
 	
+	if os.Args[1] == "go" {
+		fmt.Println(compiler.Script)
+		return
+	}
+	
 	var OutputFilePath string = "./"+Go.DefaultFileName
 	if os.Args[1] == "build" {
 		defer func() {
@@ -100,8 +105,8 @@ func main() {
 	}
 	
 	switch os.Args[1] {
-		case "build", "run":
-			build()
+		case "build", "run", "go":
+			
 			directory, err := os.Getwd()
 			if err != nil {
 				fmt.Println(err)
