@@ -11,8 +11,6 @@ main
 	
 	c = [a*e, 32, add(a, b), 32, 98]
 
-	for value in c
-		write(value, " ")
-	}
+	for value in c: write(value, " ")
 	write("\n")
 }
