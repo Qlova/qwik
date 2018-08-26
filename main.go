@@ -12,16 +12,9 @@ import (
 	"io/ioutil"
 )
 
-func build() {
-	directory, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func build(i string) {
 	
-	name := path.Base(directory)
-	
-	file, err := os.Open(directory+"/"+name+".i")
+	file, err := os.Open(i)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -109,6 +102,19 @@ func main() {
 	switch os.Args[1] {
 		case "build", "run":
 			build()
+			directory, err := os.Getwd()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			
+			name := path.Base(directory)
+			
+			if len(os.Args) < 3 {
+				build(directory+"/"+name+".i")
+			} else {
+				build(os.Args[2])
+			}
 			
 		default:
 			fmt.Println("Usage: qwik [build/run]")
