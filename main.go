@@ -6,10 +6,8 @@ import (
 	"path"
 
 	"github.com/qlova/script/compiler"
-	"github.com/qlova/script/languages/go"
+	"github.com/qlova/script/language/go"
 	"github.com/qlova/i/syntax"
-	
-	"io/ioutil"
 )
 
 func build(i string) {
@@ -22,24 +20,33 @@ func build(i string) {
 
 	var compiler = compiler.New()
 	var language = Go.Language()
-	
-	compiler.Script.SetLanguage(language)
-	
+
 	compiler.SetSyntax(ilang.Syntax)
 	
 	compiler.AddInput(file)
-	compiler.Compile()
-	
-	if compiler.Errors {
-		return
-	}
+	var program = compiler.Compile()
 	
 	if os.Args[1] == "go" {
-		fmt.Println(compiler.Script)
+		source, err := program.Source(language)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(source)
 		return
 	}
 	
-	var OutputFilePath string = "./"+Go.DefaultFileName
+	//Interpreter.
+	if os.Args[1] == "run" {
+		err = program.Run()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		return
+	}
+	
+	var OutputFilePath string = "./main.go"
 	if os.Args[1] == "build" {
 		defer func() {
 			err = os.Remove(OutputFilePath)
@@ -48,51 +55,16 @@ func build(i string) {
 				return
 			}
 		}()
-	}
 	
-	if os.Args[1] == "run" {
-
-		TemporaryDirectory, err := ioutil.TempDir("", "qwik")
+		err = program.WriteToFile(OutputFilePath, language)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		
-		defer func() {
-			err = os.RemoveAll(TemporaryDirectory)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-		}()
-		
-		OutputFilePath = TemporaryDirectory+"/"+Go.DefaultFileName
-	}
-		
-	OutputFile, err := os.Create(OutputFilePath)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	compiler.Script.WriteTo(OutputFile)
-	OutputFile.Close()
-	
-		
-	output, err := language.Build(OutputFilePath).CombinedOutput()
-	if err != nil {
-		os.Stdout.Write(output)
-		return
-	}
-	
-	if os.Args[1] == "run" {
-		cmd := language.Run(OutputFilePath)
-		cmd.Stdout = os.Stdout
-		cmd.Stdin = os.Stdin
-		cmd.Stderr = os.Stderr
-		err = cmd.Run()
-		
+			
+		output, err := language.Build(OutputFilePath).CombinedOutput()
 		if err != nil {
-			fmt.Println(err)
+			os.Stdout.Write(output)
 			return
 		}
 	}
