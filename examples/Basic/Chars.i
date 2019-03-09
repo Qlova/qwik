@@ -1,4 +1,4 @@
 main
-	print(number('a'))
+	print(integer('a'))
 	print(string(symbol(97)))
 }

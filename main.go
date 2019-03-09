@@ -6,7 +6,6 @@ import (
 	"path"
 
 	"github.com/qlova/script/compiler"
-	"github.com/qlova/script/language/go"
 	"github.com/qlova/i/syntax"
 )
 
@@ -19,20 +18,19 @@ func build(i string) {
 	}
 
 	var compiler = compiler.New()
-	var language = Go.Language()
 
 	compiler.SetSyntax(ilang.Syntax)
 	
 	compiler.AddInput(file)
-	var program = compiler.Compile()
+	var program = compiler.GetProgram()
 	
 	if os.Args[1] == "go" {
-		source, err := program.Source(language)
-		if err != nil {
-			fmt.Println(err)
+		code := program.Go()
+		if code.Error {
+			fmt.Println(code.ErrorMessage)
 			return
 		}
-		fmt.Println(source)
+		fmt.Println(code)
 		return
 	}
 	
@@ -46,7 +44,7 @@ func build(i string) {
 		return
 	}
 	
-	var OutputFilePath string = "./main.go"
+	/*var OutputFilePath string = "./main.go"
 	if os.Args[1] == "build" {
 		defer func() {
 			err = os.Remove(OutputFilePath)
@@ -55,6 +53,7 @@ func build(i string) {
 				return
 			}
 		}()
+		
 	
 		err = program.WriteToFile(OutputFilePath, language)
 		if err != nil {
@@ -67,7 +66,7 @@ func build(i string) {
 			os.Stdout.Write(output)
 			return
 		}
-	}
+	}*/
 }
 
 func main() {
