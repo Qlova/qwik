@@ -1,6 +1,6 @@
 main
-	a = number(read(' '))
-	b = number(read())
+	a = integer(read(' '))
+	b = integer(read())
 	
 	print(a + b)
 }
